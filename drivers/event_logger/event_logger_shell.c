@@ -7,23 +7,10 @@
 #include <zephyr/logging/log.h>
 #include <zephyr/sys/barrier.h>
 
+#include "event_logger.h"
+
 LOG_MODULE_REGISTER(event_logger, LOG_LEVEL_DBG);
 #include <zephyr/shell/shell.h>
-
-#define GlobalLogger_INDEX_BITS 2
-#define GlobalLogger_SIGNATURE 0x2425af75
-#define GlobalLogger_EVENT_COUNT 3
-typedef struct GlobalLogger_info_t {
-   uint32_t ctrl;
-   uint32_t captured_events;
-   uint32_t checksum;
-   uint32_t sysclk_lsb;
-   uint32_t fifo_occupancy;
-   uint32_t inactive_mask;
-   uint32_t signature;
-   uint32_t dropped_events;
-   uint32_t event_counter[3];
-} GlobalLogger_info_t;
 
 static GlobalLogger_info_t GlobalLogger_info_get(volatile uint32_t* base) {
   GlobalLogger_info_t rtn = (GlobalLogger_info_t) {
@@ -36,7 +23,7 @@ static GlobalLogger_info_t GlobalLogger_info_get(volatile uint32_t* base) {
     .signature = base[12],
     .dropped_events = base[13]
   };
-  for(int i = 0;i < 3;i++) {
+  for(int i = 0;i < GlobalLogger_EVENT_COUNT;i++) {
      rtn.event_counter[i] = base[56/4 + i];
   }
   return rtn;
@@ -182,7 +169,7 @@ static int cmd_info(const struct shell *sh, size_t argc, char **argv) {
   for(int i = 0;i < GlobalLogger_EVENT_COUNT;i++) {
     SHELL_OR_LOG(sh, "%s %20s [%3d]: %11d -> %11d -> %11d",
 		 ((info.inactive_mask & (1 << i)) == 0) ? " " : "*",
-		 GlobalLogger_get_id_name(i), i, info.event_counter[i], info.event_counter[i] - old_histogram[i], info.event_counter[i]);
+		 GlobalLogger_get_id_name(i), i, old_histogram[i], info.event_counter[i] - old_histogram[i], info.event_counter[i]);
     old_histogram[i] = info.event_counter[i];
   }
 

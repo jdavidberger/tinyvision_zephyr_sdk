@@ -48,12 +48,12 @@
 
 				boot_partition: partition@0 {
 					label = "fpga";
-					reg = <0x000000 0x100000>;
+					reg = <0x000000 0x200000>;
 				};
 
-				slot0_partition: partition@100000 {
+				slot0_partition: partition@200000 {
 					label = "image-0";
-					reg = <0x100000 0x100000>;
+					reg = <0x200000 0x100000>;
 				};
 
 				slot1_partition: partition@300000 {

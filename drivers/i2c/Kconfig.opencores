@@ -1,8 +1,13 @@
-
-config I2C_OPENCORES
+config I2C_OPENCORES_ALT
 	bool "Opencores I2C driver"
-	default y
+	default n
 	depends on DT_HAS_OPENCORES_I2C_ENABLED
 	help
 	  Enable support for Litex I2C driver
 
+config I2C_OPENCORES
+	bool "Opencores I2C driver"
+	default y
+	depends on DT_HAS_OPENCORES_I2C_ENABLED && !I2C_OPENCORES_ALT
+	help
+	  Enable support for Litex I2C driver
